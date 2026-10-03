@@ -9,7 +9,7 @@ pub const PQMFState = struct {
 
 /// Create the per-channel PQMF history state.
 pub fn createPQMFState() PQMFState {
-    return .{ .v = [_]f64{0} ** 1024 };
+    return .{ .v = @splat(0) };
 }
 
 /// Run one time step of the synthesis filterbank.

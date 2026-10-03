@@ -160,7 +160,7 @@ pub fn createDecoderState(allocator: std.mem.Allocator) DecoderState {
     _ = allocator;
     return .{
         .reservoir = std.ArrayList(u8).empty,
-        .overlap = .{ [_]f64{0} ** 576, [_]f64{0} ** 576 },
+        .overlap = .{ @splat(0), @splat(0) },
         .pqmfState = .{ pqmf.createPQMFState(), pqmf.createPQMFState() },
     };
 }
@@ -219,8 +219,8 @@ pub fn decodeFrame(allocator: std.mem.Allocator, bytes: []const u8, header: Fram
     // -- Parse granule/channel data -------------------------------------------
     const granuleCount: usize = if (isMono) 2 else 4;
     var scaleFactors: [4]huffman.ScaleFactorObject = undefined;
-    var samples: [4][576]i32 = [_][576]i32{[_]i32{0} ** 576} ** 4;
-    var requantized: [4][576]f64 = [_][576]f64{[_]f64{0} ** 576} ** 4;
+    var samples: [4][576]i32 = @splat(@splat(0));
+    var requantized: [4][576]f64 = @splat(@splat(0));
 
     var prevGranuleScaleLong: ?[2][22]i32 = null;
     var bitcount: usize = 0;
@@ -240,7 +240,7 @@ pub fn decodeFrame(allocator: std.mem.Allocator, bytes: []const u8, header: Fram
         if (gr.granule == 0) {
             switch (sfParsed.scaleFactors) {
                 .long => |l| {
-                    if (prevGranuleScaleLong == null) prevGranuleScaleLong = [_][22]i32{ [_]i32{0} ** 22, [_]i32{0} ** 22 };
+                    if (prevGranuleScaleLong == null) prevGranuleScaleLong = [_][22]i32{ @splat(0), @splat(0) };
                     prevGranuleScaleLong.?[gr.channel] = l;
                 },
                 else => {},
@@ -280,7 +280,7 @@ pub fn decodeFrame(allocator: std.mem.Allocator, bytes: []const u8, header: Fram
     }
 
     // -- Reorder -> Anti-alias -> IMDCT ---------------------------------------
-    var pcm: [4][576]f64 = [_][576]f64{[_]f64{0} ** 576} ** 4;
+    var pcm: [4][576]f64 = @splat(@splat(0));
     i = 0;
     while (i < granuleCount) : (i += 1) {
         const gr = sInfo.sideInfoGr[i];
@@ -467,7 +467,7 @@ pub fn decodeAllFrames(allocator: std.mem.Allocator, buffer: []const u8) !Decode
     const encoderDelay: usize = 0;
     const endPadding: usize = 0;
 
-    var stepOut: [2][32]f64 = [_][32]f64{[_]f64{0} ** 32} ** 2;
+    var stepOut: [2][32]f64 = @splat(@splat(0));
 
     var offset: usize = skipId3v2(buffer);
     while (offset + 4 <= buffer.len) {
@@ -501,7 +501,7 @@ pub fn decodeAllFrames(allocator: std.mem.Allocator, buffer: []const u8) !Decode
         const decoded = try decodeFrame(allocator, buffer, header.?, &state);
         if (decoded) |d| {
             const numGranules: usize = 2;
-            var framePcm: [2304]f32 = [_]f32{0} ** 2304;
+            var framePcm: [2304]f32 = @splat(0);
             var outPos: usize = 0;
 
             var g: usize = 0;
@@ -578,7 +578,7 @@ pub fn decodeAllFramesRealtime(
     const encoderDelay: usize = 0;
     const endPadding: usize = 0;
     var emittedInterleaved: usize = 0;
-    var stepOut: [2][32]f64 = [_][32]f64{[_]f64{0} ** 32} ** 2;
+    var stepOut: [2][32]f64 = @splat(@splat(0));
 
     var offset: usize = skipId3v2(buffer);
     while (offset + 4 <= buffer.len) {
@@ -611,7 +611,7 @@ pub fn decodeAllFramesRealtime(
         const decoded = try decodeFrame(allocator, buffer, header.?, &state);
         if (decoded) |d| {
             const numGranules: usize = 2;
-            var framePcm: [2304]f32 = [_]f32{0} ** 2304;
+            var framePcm: [2304]f32 = @splat(0);
             var outPos: usize = 0;
 
             var g: usize = 0;

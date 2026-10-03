@@ -414,7 +414,7 @@ pub const synthWindow = [512]f64{
 
 // Cosine matrixing matrix N[i][k] = cos((16+i)(2k+1)pi/64), i=0..63, k=0..31.
 // Computed at runtime in pqmf.zig to avoid large compile-time loops.
-pub const lookup = [_]f64{0} ** (64 * 32);
+pub const lookup: [64 * 32]f64 = @splat(0);
 
 pub fn getHuffmanTable(id: u8) []const []const HuffCell {
     if (id >= 32) @panic("Table ID should be between 0-31");

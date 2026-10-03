@@ -35,7 +35,7 @@ pub fn parseScaleFactors(data: []const u8, sideInfo: SideInfo, granule: Granule,
 
     if (granule.blockType == 2 and granule.windowSwitchFlag) {
         if (granule.mixedBlockFlag) {
-            var longData: [8]i32 = [_]i32{0} ** 8;
+            var longData: [8]i32 = @splat(0);
             var i: usize = 0;
             while (i < 8) : (i += 1) {
                 const r = bits.getBits2(bitoffset, len0, data);
@@ -43,7 +43,7 @@ pub fn parseScaleFactors(data: []const u8, sideInfo: SideInfo, granule: Granule,
                 longData[i] = @intCast(r.value);
             }
 
-            var shortData: [3][13]i32 = [_][13]i32{[_]i32{0} ** 13} ** 3;
+            var shortData: [3][13]i32 = @splat(@splat(0));
             var sfb: usize = 3;
             while (sfb <= 5) : (sfb += 1) {
                 var win: usize = 0;
@@ -66,7 +66,7 @@ pub fn parseScaleFactors(data: []const u8, sideInfo: SideInfo, granule: Granule,
             return .{ .scaleFactors = .{ .mixed = .{ .long = longData, .short = shortData } }, .bitsConsumed = bitoffset };
         }
 
-        var shortData: [3][13]i32 = [_][13]i32{[_]i32{0} ** 13} ** 3;
+        var shortData: [3][13]i32 = @splat(@splat(0));
         var sfb: usize = 0;
         while (sfb <= 5) : (sfb += 1) {
             var win: usize = 0;
@@ -89,7 +89,7 @@ pub fn parseScaleFactors(data: []const u8, sideInfo: SideInfo, granule: Granule,
     }
 
     // Long block
-    var longData: [22]i32 = [_]i32{0} ** 22;
+    var longData: [22]i32 = @splat(0);
     if (granule.granule == 0) {
         var sfb: usize = 0;
         while (sfb <= 10) : (sfb += 1) {
@@ -143,7 +143,7 @@ pub fn parseScaleFactors(data: []const u8, sideInfo: SideInfo, granule: Granule,
 
 /// Decode Huffman-coded spectral data for one granule/channel.
 pub fn parseHuffmanData(data: []const u8, offset: usize, maxbit: usize, bandIndexLong: []const u32, granule: Granule) [576]i32 {
-    var samples: [576]i32 = [_]i32{0} ** 576;
+    var samples: [576]i32 = @splat(0);
     const bitsArray = data;
 
     var bitoffset = offset;
@@ -235,7 +235,7 @@ pub fn parseHuffmanData(data: []const u8, offset: usize, maxbit: usize, bandInde
     // Decode count1 (quad-values) region
     const quadStart = samplecount;
     var quadCount: usize = 0;
-    var quadSamples: [576]i32 = [_]i32{0} ** 576;
+    var quadSamples: [576]i32 = @splat(0);
 
     while (bitoffset < maxbit and (samplecount + 4) <= 576) {
         var quadvalues: [4]u8 = .{ 0, 0, 0, 0 };

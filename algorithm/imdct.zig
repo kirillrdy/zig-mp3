@@ -14,7 +14,7 @@ pub const Granule = struct {
 };
 
 fn processLong(s: []const f64, win: []const f64, prevOverlap: *[18]f64, pcmOut: *[18]f64) void {
-    var y: [36]f64 = [_]f64{0} ** 36;
+    var y: [36]f64 = @splat(0);
     var n: usize = 0;
     while (n < 36) : (n += 1) {
         var sum: f64 = 0;
@@ -35,7 +35,7 @@ fn processLong(s: []const f64, win: []const f64, prevOverlap: *[18]f64, pcmOut: 
 fn processShort(s0: []const f64, s1: []const f64, s2: []const f64, prevOverlap: *[18]f64, pcmOut: *[18]f64) void {
     const w = tables.sineBlock[2][0..];
     const subs = [_][]const f64{ s0, s1, s2 };
-    var yw: [3][12]f64 = [_][12]f64{[_]f64{0} ** 12} ** 3;
+    var yw: [3][12]f64 = @splat(@splat(0));
 
     var win: usize = 0;
     while (win < 3) : (win += 1) {
@@ -51,7 +51,7 @@ fn processShort(s0: []const f64, s1: []const f64, s2: []const f64, prevOverlap: 
         }
     }
 
-    var z: [36]f64 = [_]f64{0} ** 36;
+    var z: [36]f64 = @splat(0);
     var n: usize = 0;
     while (n < 6) : (n += 1) z[n + 6] = yw[0][n];
     n = 0;
@@ -70,7 +70,7 @@ fn processShort(s0: []const f64, s1: []const f64, s2: []const f64, prevOverlap: 
 
 /// Apply IMDCT and overlap-add for one granule/channel.
 pub fn applyIMDCT(xr: []const f64, sfType: SfType, granule: Granule, overlap: *[576]f64) [576]f64 {
-    var pcm: [576]f64 = [_]f64{0} ** 576;
+    var pcm: [576]f64 = @splat(0);
     const bt = if (sfType == .mixed) 0 else granule.blockType;
     const longWin = tables.sineBlock[if (bt == 1) 1 else if (bt == 3) 3 else 0][0..];
 
@@ -78,7 +78,7 @@ pub fn applyIMDCT(xr: []const f64, sfType: SfType, granule: Granule, overlap: *[
     while (sb < 32) : (sb += 1) {
         var prevOverlap: [18]f64 = undefined;
         @memcpy(prevOverlap[0..], overlap[sb * 18 .. sb * 18 + 18]);
-        var pcmSb: [18]f64 = [_]f64{0} ** 18;
+        var pcmSb: [18]f64 = @splat(0);
 
         if (sfType == .short or (sfType == .mixed and sb >= 2)) {
             var s0: []const f64 = undefined;

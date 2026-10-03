@@ -6,7 +6,7 @@ const SQRT2 = std.math.sqrt(2.0);
 
 // Precomputed (kl, kr) for IS positions 0..6.
 const IS_COEFF = blk: {
-    var out: [7][2]f64 = [_][2]f64{.{ 0, 0 }} ** 7;
+    var out: [7][2]f64 = @splat(.{ 0, 0 });
     var p: usize = 0;
     while (p < 7) : (p += 1) {
         if (p == 6) {

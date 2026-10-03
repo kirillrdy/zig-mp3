@@ -32,7 +32,7 @@ pub const BandIndex = struct {
 
 /// Requantize the spectral integers for one granule/channel.
 pub fn requantizeGranule(samples: []const i32, scaleFactors: ScaleFactors, granule: Granule, bandIndex: BandIndex) [576]f64 {
-    var output: [576]f64 = [_]f64{0} ** 576;
+    var output: [576]f64 = @splat(0);
     const sfcMult: f64 = if (granule.scaleFactorScale != 0) 1.0 else 0.5;
     const globalGainPow = std.math.pow(f64, 2.0, 0.25 * (@as(f64, @floatFromInt(granule.globalGain)) - 210.0));
 
